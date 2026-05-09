@@ -1,6 +1,5 @@
 import { useState } from "react";
-import { useAuth } from "../context/useAuth";
-
+import { useAuth } from "../../context/useAuth";
 function ForgetPassword() {
   const { forgotPassword } = useAuth();
   const [email, setEmail] = useState("");

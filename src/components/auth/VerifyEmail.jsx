@@ -1,24 +1,32 @@
 import { useState, useRef, useEffect } from "react";
-import { useAuth } from "../context/useAuth";
+import { useAuth } from "../../context/useAuth";
+// import ResetPassword from "./components/auth/ResetPassword";
+// import VerifyEmail from "./components/auth/VerifyEmail";
 
 function VerifyEmail() {
-  const { verifyEmail, resendEmailOtp, verifyPasswordOtp, resendPasswordOtp } = useAuth();
+  const { verifyEmail, resendEmailOtp, verifyPasswordOtp, resendPasswordOtp } =
+    useAuth();
   const [code, setCode] = useState(["", "", "", "", "", ""]);
   const [status, setStatus] = useState("idle");
   const [email] = useState(() => {
-    return sessionStorage.getItem("resetEmail") || sessionStorage.getItem("verifyEmail") || "";
+    return (
+      sessionStorage.getItem("resetEmail") ||
+      sessionStorage.getItem("verifyEmail") ||
+      ""
+    );
   });
   const [error, setError] = useState(() => {
     const resetEmail = sessionStorage.getItem("resetEmail");
     const verifyEmailValue = sessionStorage.getItem("verifyEmail");
-    return resetEmail || verifyEmailValue ? "" : "Email not found. Please try again.";
+    return resetEmail || verifyEmailValue
+      ? ""
+      : "Email not found. Please try again.";
   });
   const [resendTimer, setResendTimer] = useState(0);
   const [verifyMode] = useState(() => {
     return sessionStorage.getItem("resetEmail") ? "password" : "email";
   });
   const inputs = useRef([]);
-
 
   useEffect(() => {
     let timer;
@@ -78,15 +86,20 @@ function VerifyEmail() {
         // Password reset OTP verification
         const response = await verifyPasswordOtp(email, otp);
         // Store the resetToken for the next step (response is already unwrapped data from context)
-        sessionStorage.setItem("resetToken", response.resetToken || response.data?.resetToken);
+        sessionStorage.setItem(
+          "resetToken",
+          response.resetToken || response.data?.resetToken,
+        );
         // DON'T remove resetEmail here - we need it in the next step!
-        
+
         if (typeof window.navigateToResetPassword === "function") {
           window.navigateToResetPassword();
         }
       }
     } catch (err) {
-      setError(err.response?.data?.message || "Verification failed. Please try again.");
+      setError(
+        err.response?.data?.message || "Verification failed. Please try again.",
+      );
       setStatus("idle");
     }
   };
@@ -244,9 +257,10 @@ function VerifyEmail() {
             padding: "16px",
             border: "none",
             borderRadius: 50,
-            background: code.every((d) => d) && email
-              ? "linear-gradient(to right, #93c5fd, #5b9eff)"
-              : "#e5e7eb",
+            background:
+              code.every((d) => d) && email
+                ? "linear-gradient(to right, #93c5fd, #5b9eff)"
+                : "#e5e7eb",
             color: code.every((d) => d) && email ? "white" : "#9ca3af",
             fontSize: 17,
             fontWeight: 600,

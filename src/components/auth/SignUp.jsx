@@ -1,8 +1,7 @@
 import React, { useState } from "react";
 import "./SignUp.css";
-import { useAuth } from "../context/useAuth";
-import IllustrationImg from "../assets/Illustrartion.png";
-
+import { useAuth } from "../../context/useAuth";
+import IllustrationImg from "../../assets/general/Illustrartion.png";
 function SignUp() {
   const { register } = useAuth();
   const [formData, setFormData] = useState({
@@ -33,7 +32,7 @@ function SignUp() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (formData.password !== formData.confirmPassword) {
       setPasswordError("Passwords do not match");
       return;
@@ -54,18 +53,21 @@ function SignUp() {
         formData.email,
         formData.password,
         formData.confirmPassword,
-        formData.rememberMe
+        formData.rememberMe,
       );
 
       // Store email temporarily for VerifyEmail component
       sessionStorage.setItem("verifyEmail", formData.email);
-      
+
       // Navigate to verify email page
       if (typeof window.navigateToVerify === "function") {
         window.navigateToVerify();
       }
     } catch (error) {
-      setServerError(error.response?.data?.message || "Registration failed. Please try again.");
+      setServerError(
+        error.response?.data?.message ||
+          "Registration failed. Please try again.",
+      );
     } finally {
       setLoading(false);
     }

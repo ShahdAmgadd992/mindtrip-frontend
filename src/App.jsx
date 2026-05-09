@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
-import SignUp from "./components/SignUp";
-import SignIn from "./components/SignIn";
-import ForgetPassword from "./components/ForgetPassword";
-import VerifyEmail from "./components/VerifyEmail";
-import ResetPassword from "./components/ResetPassword";
-import Home from "./components/Home";
-import Explore from "./components/Explore";
+import SignUp from "./components/auth/SignUp";
+import SignIn from "./components/auth/SignIn";
+import ForgetPassword from "./components/auth/ForgetPassword";
+import VerifyEmail from "./components/auth/VerifyEmail";
+import ResetPassword from "./components/auth/ResetPassword";
+import Home from "./components/pages/Home";
+import Explore from "./components/pages/Explore";
+// import Explore from "./components/Explore";
 import { AuthProvider } from "./context/AuthContext";
 
 function App() {

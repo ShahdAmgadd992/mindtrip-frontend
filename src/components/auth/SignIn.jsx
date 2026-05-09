@@ -1,8 +1,7 @@
 import React, { useState } from "react";
 import "./SignIn.css";
-import { useAuth } from "../context/useAuth";
-import IllustrationImg from "../assets/Illustrartion.png";
-
+import { useAuth } from "../../context/useAuth";
+import IllustrationImg from "../../assets/general/Illustrartion.png";
 function SignIn() {
   const { login, verifyLoginOtp, resendLoginOtp } = useAuth();
   const [email, setEmail] = useState("");
@@ -53,7 +52,8 @@ function SignIn() {
         }
       }
     } catch (err) {
-      const errorMsg = err.response?.data?.message || err.message || "Login failed";
+      const errorMsg =
+        err.response?.data?.message || err.message || "Login failed";
       setError(errorMsg);
       setLoading(false);
     }
@@ -78,7 +78,8 @@ function SignIn() {
         window.navigateToDashboard();
       }
     } catch (err) {
-      const errorMsg = err.response?.data?.message || err.message || "2FA verification failed";
+      const errorMsg =
+        err.response?.data?.message || err.message || "2FA verification failed";
       setError(errorMsg);
       setTwoFaLoading(false);
     }
@@ -90,7 +91,8 @@ function SignIn() {
       await resendLoginOtp(email);
       setResendTimer(60);
     } catch (err) {
-      const errorMsg = err.response?.data?.message || err.message || "Failed to resend OTP";
+      const errorMsg =
+        err.response?.data?.message || err.message || "Failed to resend OTP";
       setError(errorMsg);
     }
   };
@@ -181,7 +183,9 @@ function SignIn() {
                 </div>
 
                 {error && (
-                  <p style={{ color: "#dc2626", fontSize: 14, margin: "8px 0" }}>
+                  <p
+                    style={{ color: "#dc2626", fontSize: 14, margin: "8px 0" }}
+                  >
                     {error}
                   </p>
                 )}
@@ -200,7 +204,9 @@ function SignIn() {
                     className="signin-forgot"
                     onClick={(e) => {
                       e.preventDefault();
-                      if (typeof window.navigateToForgetPassword === "function") {
+                      if (
+                        typeof window.navigateToForgetPassword === "function"
+                      ) {
                         window.navigateToForgetPassword();
                       }
                     }}
@@ -209,13 +215,24 @@ function SignIn() {
                   </a>
                 </div>
 
-                <button type="submit" className="signin-submit-btn" disabled={loading}>
+                <button
+                  type="submit"
+                  className="signin-submit-btn"
+                  disabled={loading}
+                >
                   {loading ? "Signing In..." : "Sign In"}
                 </button>
               </form>
             ) : (
               <form className="signin-form" onSubmit={handleVerify2FA}>
-                <h2 style={{ fontSize: 20, fontWeight: 600, color: "#374151", marginBottom: 16 }}>
+                <h2
+                  style={{
+                    fontSize: 20,
+                    fontWeight: 600,
+                    color: "#374151",
+                    marginBottom: 16,
+                  }}
+                >
                   Two-Factor Authentication
                 </h2>
                 <p style={{ fontSize: 14, color: "#6b7280", marginBottom: 20 }}>
@@ -229,7 +246,9 @@ function SignIn() {
                     placeholder="000000"
                     value={twoFaCode}
                     onChange={(e) => {
-                      setTwoFaCode(e.target.value.replace(/\D/g, "").slice(0, 6));
+                      setTwoFaCode(
+                        e.target.value.replace(/\D/g, "").slice(0, 6),
+                      );
                       setError("");
                     }}
                     maxLength="6"
@@ -244,14 +263,23 @@ function SignIn() {
                       stroke="currentColor"
                       strokeWidth="2"
                     >
-                      <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                      <rect
+                        x="3"
+                        y="11"
+                        width="18"
+                        height="11"
+                        rx="2"
+                        ry="2"
+                      ></rect>
                       <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
                     </svg>
                   </div>
                 </div>
 
                 {error && (
-                  <p style={{ color: "#dc2626", fontSize: 14, margin: "8px 0" }}>
+                  <p
+                    style={{ color: "#dc2626", fontSize: 14, margin: "8px 0" }}
+                  >
                     {error}
                   </p>
                 )}

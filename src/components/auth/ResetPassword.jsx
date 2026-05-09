@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
-import { useAuth } from "../context/useAuth";
-import { validatePassword } from "../utils/passwordValidator";
+import { useAuth } from "../../context/useAuth";
+import { validatePassword } from "../../utils/passwordValidator";
+// import ResetPassword from "./components/auth/ResetPassword";
+// import VerifyEmail from "./components/auth/VerifyEmail";
 
 function ResetPassword() {
   const { resetPassword } = useAuth();
@@ -22,7 +24,7 @@ function ResetPassword() {
     if (storedEmail) {
       setEmail(storedEmail);
     }
-    
+
     if (storedResetToken) {
       setResetToken(storedResetToken);
     } else if (storedEmail && !storedResetToken) {
@@ -56,7 +58,9 @@ function ResetPassword() {
     const tokenFromSession = sessionStorage.getItem("resetToken") || resetToken;
 
     if (!emailFromSession || !tokenFromSession) {
-      setError("Missing email or reset token. Please start the password reset flow again.");
+      setError(
+        "Missing email or reset token. Please start the password reset flow again.",
+      );
       return;
     }
 
@@ -65,22 +69,32 @@ function ResetPassword() {
 
     try {
       // Log request for debugging
-      console.log("Attempting password reset with:", { 
-        email: emailFromSession, 
-        resetToken: tokenFromSession ? `${tokenFromSession.substring(0, 10)}...` : "missing"
+      console.log("Attempting password reset with:", {
+        email: emailFromSession,
+        resetToken: tokenFromSession
+          ? `${tokenFromSession.substring(0, 10)}...`
+          : "missing",
       });
-      
-      await resetPassword(emailFromSession, tokenFromSession, newPassword, confirmPassword);
-      
+
+      await resetPassword(
+        emailFromSession,
+        tokenFromSession,
+        newPassword,
+        confirmPassword,
+      );
+
       // Clear stored data
       sessionStorage.removeItem("resetEmail");
       sessionStorage.removeItem("resetToken");
-      
+
       setStatus("success");
     } catch (err) {
       // Better error logging
       console.error("Password reset error:", err);
-      const errorMsg = err.response?.data?.message || err.message || "Password reset failed. Please try again.";
+      const errorMsg =
+        err.response?.data?.message ||
+        err.message ||
+        "Password reset failed. Please try again.";
       console.error("Error message:", errorMsg);
       setError(errorMsg);
       setStatus("idle");
@@ -207,11 +221,26 @@ function ResetPassword() {
         }}
       >
         <div style={{ width: "100%", maxWidth: 560, textAlign: "center" }}>
-          <h1 style={{ fontSize: 38, fontWeight: 700, margin: "0 0 32px", color: "#dc2626" }}>
+          <h1
+            style={{
+              fontSize: 38,
+              fontWeight: 700,
+              margin: "0 0 32px",
+              color: "#dc2626",
+            }}
+          >
             Invalid Reset Link
           </h1>
-          <p style={{ fontSize: 14, color: "#6b7280", margin: "0 0 30px", lineHeight: 1.6 }}>
-            {error || "Please request a password reset code first by clicking 'Forgot Password?' on the login page."}
+          <p
+            style={{
+              fontSize: 14,
+              color: "#6b7280",
+              margin: "0 0 30px",
+              lineHeight: 1.6,
+            }}
+          >
+            {error ||
+              "Please request a password reset code first by clicking 'Forgot Password?' on the login page."}
           </p>
           <button
             onClick={() => window.navigateToForgetPassword?.()}
@@ -401,8 +430,16 @@ function ResetPassword() {
               border: `1px solid ${passwordValidation.isValid ? "#bbf7d0" : "#fecaca"}`,
             }}
           >
-            <div style={{ fontWeight: 600, marginBottom: 8, color: passwordValidation.isValid ? "#065f46" : "#7f1d1d" }}>
-              {passwordValidation.isValid ? "✓ Password is valid" : "Password requirements:"}
+            <div
+              style={{
+                fontWeight: 600,
+                marginBottom: 8,
+                color: passwordValidation.isValid ? "#065f46" : "#7f1d1d",
+              }}
+            >
+              {passwordValidation.isValid
+                ? "✓ Password is valid"
+                : "Password requirements:"}
             </div>
             {!passwordValidation.isValid && (
               <ul style={{ margin: 0, paddingLeft: 20, color: "#7f1d1d" }}>
@@ -499,7 +536,13 @@ function ResetPassword() {
         <form onSubmit={handleSubmit}>
           <button
             type="submit"
-            disabled={status === "loading" || newPassword !== confirmPassword || !newPassword || !confirmPassword || !passwordValidation?.isValid}
+            disabled={
+              status === "loading" ||
+              newPassword !== confirmPassword ||
+              !newPassword ||
+              !confirmPassword ||
+              !passwordValidation?.isValid
+            }
             style={{
               width: "100%",
               padding: "15px",
@@ -509,19 +552,41 @@ function ResetPassword() {
               color: "#5b9eff",
               fontSize: 16,
               fontWeight: 600,
-              cursor: status === "loading" || newPassword !== confirmPassword || !newPassword || !passwordValidation?.isValid ? "not-allowed" : "pointer",
+              cursor:
+                status === "loading" ||
+                newPassword !== confirmPassword ||
+                !newPassword ||
+                !passwordValidation?.isValid
+                  ? "not-allowed"
+                  : "pointer",
               transition: "all 0.25s",
               marginTop: 8,
-              opacity: status === "loading" || newPassword !== confirmPassword || !newPassword || !passwordValidation?.isValid ? 0.6 : 1,
+              opacity:
+                status === "loading" ||
+                newPassword !== confirmPassword ||
+                !newPassword ||
+                !passwordValidation?.isValid
+                  ? 0.6
+                  : 1,
             }}
             onMouseEnter={(e) => {
-              if (status !== "loading" && newPassword === confirmPassword && newPassword && passwordValidation?.isValid) {
+              if (
+                status !== "loading" &&
+                newPassword === confirmPassword &&
+                newPassword &&
+                passwordValidation?.isValid
+              ) {
                 e.currentTarget.style.background = "#5b9eff";
                 e.currentTarget.style.color = "white";
               }
             }}
             onMouseLeave={(e) => {
-              if (status !== "loading" && newPassword === confirmPassword && newPassword && passwordValidation?.isValid) {
+              if (
+                status !== "loading" &&
+                newPassword === confirmPassword &&
+                newPassword &&
+                passwordValidation?.isValid
+              ) {
                 e.currentTarget.style.background = "white";
                 e.currentTarget.style.color = "#5b9eff";
               }
