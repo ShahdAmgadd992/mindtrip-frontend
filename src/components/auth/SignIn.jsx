@@ -103,7 +103,8 @@ function SignIn() {
       window.navigateToSignUp();
       return;
     }
-    window.location.href = "/";
+    window.history.pushState({}, "", "/signup");
+    window.dispatchEvent(new PopStateEvent("popstate"));
   };
 
   return (

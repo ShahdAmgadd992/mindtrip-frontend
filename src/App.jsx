@@ -9,9 +9,22 @@ import Explore from "./components/pages/Explore";
 import { AuthProvider } from "./context/AuthContext";
 import Profile from "./components/pages/Profile";
 import AiPlanner from "./components/pages/AiPlanner";
+import Landing from "./components/pages/Landing";
 
 function App() {
-  const [currentPage, setCurrentPage] = useState("home");
+  const [currentPage, setCurrentPage] = useState(() => {
+    const path = window.location.pathname;
+    if (path === "/signin" || path === "/sign-in") return "signin";
+    if (path === "/signup" || path === "/sign-up") return "signup";
+    if (path === "/forget-password") return "forgetPassword";
+    if (path === "/verify-email") return "verifyEmail";
+    if (path === "/reset-password") return "resetPassword";
+    if (path === "/explore") return "explore";
+    if (path === "/profile") return "profile";
+    if (path === "/ai-planner") return "aiplanner";
+    if (path === "/home") return "home";
+    return "landing";
+  });
 
   useEffect(() => {
     const updatePageFromPath = () => {
@@ -32,8 +45,12 @@ function App() {
         setCurrentPage("profile");
       } else if (path === "/ai-planner") {
         setCurrentPage("aiplanner");
-      } else {
+      } else if (path === "/home") {
         setCurrentPage("home");
+      } else if (path === "/" || path === "") {
+        setCurrentPage("landing");
+      } else {
+        setCurrentPage("landing");
       }
     };
 
@@ -41,8 +58,20 @@ function App() {
 
     window.addEventListener("popstate", updatePageFromPath);
 
-    window.navigateToHome = () => {
+    window.navigateToLanding = () => {
       window.history.pushState({}, "", "/");
+      setCurrentPage("landing");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    };
+
+    window.navigateToHome = () => {
+      window.history.pushState({}, "", "/home");
+      setCurrentPage("home");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    };
+
+    window.navigateToDashboard = () => {
+      window.history.pushState({}, "", "/home");
       setCurrentPage("home");
       window.scrollTo({ top: 0, behavior: "smooth" });
     };
@@ -97,7 +126,9 @@ function App() {
 
     return () => {
       window.removeEventListener("popstate", updatePageFromPath);
+      delete window.navigateToLanding;
       delete window.navigateToHome;
+      delete window.navigateToDashboard;
       delete window.navigateToSignIn;
       delete window.navigateToSignUp;
       delete window.navigateToForgetPassword;
@@ -110,6 +141,7 @@ function App() {
   }, []);
 
   const pages = {
+    landing: <Landing onNavigate={setCurrentPage} />,
     home: <Home />,
     signup: <SignUp />,
     signin: <SignIn />,
