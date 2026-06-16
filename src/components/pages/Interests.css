@@ -1,0 +1,172 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.interests-wrapper {
+  width: 100%;
+  min-height: 100vh;
+  background: white;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 0;
+}
+
+.interests-card {
+  background: white;
+  width: 100%;
+  padding: 40px 60px 52px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.interests-logo {
+  align-self: flex-start;
+  margin-bottom: 40px;
+}
+
+.interests-logo img {
+  width: 100px;
+  height: 100px;
+  object-fit: contain;
+}
+.interests-logo span {
+  font-size: 14px;
+  font-weight: 700;
+  color: #374151;
+  letter-spacing: 0.3px;
+}
+
+/* ===== Title ===== */
+.interests-title {
+  font-family:
+    "SF Pro",
+    -apple-system,
+    BlinkMacSystemFont,
+    sans-serif;
+  font-size: 36px;
+  font-weight: 700;
+  color: #1a1a2e;
+  text-align: center;
+  line-height: 100%;
+  letter-spacing: 0%;
+  margin-bottom: 16px;
+}
+
+.interests-subtitle {
+  font-family:
+    "SF Pro",
+    -apple-system,
+    BlinkMacSystemFont,
+    sans-serif;
+  font-size: 20px;
+  font-weight: 400;
+  color: #9ca3af;
+  text-align: center;
+  line-height: 1.5;
+  letter-spacing: 0%;
+  margin-bottom: 48px;
+  max-width: 700px;
+}
+
+/* ===== Tags Grid ===== */
+.interests-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  justify-content: center;
+  margin-bottom: 52px;
+  width: 100%;
+}
+
+.interest-tag {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  border-radius: 50px;
+  border: 1.5px solid #d1d5db;
+  background: white;
+  font-family:
+    "SF Pro",
+    -apple-system,
+    BlinkMacSystemFont,
+    sans-serif;
+  font-size: 15px;
+  font-weight: 500;
+  color: #374151;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  outline: none;
+}
+
+.interest-tag:hover {
+  border-color: #5596fe;
+  color: #5596fe;
+  background: #f0f6ff;
+}
+
+.interest-tag.selected {
+  border-color: #5596fe;
+  background: #e0edff;
+  color: #5596fe;
+  font-weight: 600;
+}
+
+.interest-emoji {
+  font-size: 16px;
+  line-height: 1;
+}
+
+/* ===== Continue Button ===== */
+.interests-continue-btn {
+  background: linear-gradient(to left, #97ceff 0%, #5596fe 100%);
+  color: white;
+  border: none;
+  padding: 16px 80px;
+  border-radius: 50px;
+  font-family:
+    "SF Pro",
+    -apple-system,
+    BlinkMacSystemFont,
+    sans-serif;
+  font-size: 18px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 8px 24px rgba(85, 150, 254, 0.35);
+  display: block;
+}
+
+.interests-continue-btn:hover {
+  filter: brightness(1.05);
+  transform: translateY(-2px);
+}
+
+.interests-continue-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 600px) {
+  .interests-card {
+    padding: 32px 20px 36px;
+  }
+  .interests-title {
+    font-size: 26px;
+  }
+  .interests-subtitle {
+    font-size: 16px;
+  }
+  .interest-tag {
+    font-size: 13px;
+    padding: 10px 16px;
+  }
+}

@@ -8,9 +8,6 @@ import siwa from "../../assets/cities/siwa.jpg";
 import luxor from "../../assets/cities/luxor.jpg";
 import aswan from "../../assets/cities/aswan.jpg";
 import saintCatherine from "../../assets/cities/saintCatherine.jpg";
-// import alexandria from "../../assets/cities/alexandria.jpg";
-// import marsaMatrouh from "../../assets/cities/marsaMatrouh.jpg";
-// import hurghada from "../../assets/cities/hurghada.jpg";
 import siwaMysticRetreat from "../../assets/cities/siwa.jpg";
 import nile from "../../assets/general/Nile.jpg";
 import deepBlue from "../../assets/general/DeepBlue.jpg";
@@ -27,7 +24,6 @@ import calender from "../../assets/icons/calender.png";
 import clint1 from "../../assets/general/clint1.jpg";
 import clint2 from "../../assets/general/clint2.jpg";
 import clint3 from "../../assets/general/clint3.jpg";
-import Arrow from "../../assets/icons/Arrow.png";
 import Navbar from "../layout/Navbar";
 import Footer from "../layout/Footer";
 
@@ -76,7 +72,6 @@ const Home = () => {
       const scrolled = window.scrollY;
       const heroContent = document.querySelector(".hero-content");
       const stats = document.querySelector(".stats");
-
       if (heroContent && stats) {
         heroContent.style.transform = `translateY(${scrolled * 0.3}px)`;
         heroContent.style.opacity = 1 - scrolled / 600;
@@ -84,7 +79,6 @@ const Home = () => {
         stats.style.opacity = 1 - scrolled / 500;
       }
     };
-
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
@@ -92,11 +86,9 @@ const Home = () => {
   useEffect(() => {
     const slider = sliderRef.current;
     if (!slider) return;
-
     let isDown = false;
     let startX;
     let scrollLeft;
-
     const onMouseDown = (e) => {
       isDown = true;
       slider.style.cursor = "grabbing";
@@ -117,12 +109,10 @@ const Home = () => {
       const x = e.pageX - slider.offsetLeft;
       slider.scrollLeft = scrollLeft - (x - startX) * 2;
     };
-
     slider.addEventListener("mousedown", onMouseDown);
     slider.addEventListener("mouseleave", onMouseLeave);
     slider.addEventListener("mouseup", onMouseUp);
     slider.addEventListener("mousemove", onMouseMove);
-
     return () => {
       slider.removeEventListener("mousedown", onMouseDown);
       slider.removeEventListener("mouseleave", onMouseLeave);
@@ -139,9 +129,7 @@ const Home = () => {
         style={{ backgroundImage: `url(${bgImage})` }}
       >
         <div className="overlay" />
-
         <Navbar activePage="home" />
-
         <div className="hero-content">
           <h1>Egypt</h1>
           <p>
@@ -155,7 +143,6 @@ const Home = () => {
             Get Started
           </button>
         </div>
-
         <div className="stats">
           <div className="stat-item">
             <h3>10K</h3>
@@ -235,8 +222,8 @@ const Home = () => {
       <div className="why-choose">
         <div className="why-content">
           <h2>
-            <span style={{ color: "#5596FE" }}>Why Travelers </span>
-            Choose Mind Trip
+            <span style={{ color: "#5596FE" }}>Why Travelers </span>Choose Mind
+            Trip
           </h2>
           <p className="why-subtitle">
             Thoughtfully designed trips tailored to your mood, budget, and
@@ -286,7 +273,7 @@ const Home = () => {
         </div>
       </div>
 
-      {/* ===== Popular Destinations Section ===== */}
+      {/* ===== Hidden Gems Section ===== */}
       <div className="popular-destinations">
         <div className="popular-content">
           <h2>
@@ -375,57 +362,7 @@ const Home = () => {
         </div>
       </div>
 
-      {/* ===== Explore Without Limits Section ===== */}
-      {/* <div className="explore-section">
-        <div className="explore-content">
-          <h2>
-            <span className="blue-text">Explore</span> Without{" "}
-            <span className="blue-text">Limits</span>
-          </h2>
-          <p className="explore-subtitle">
-            Discover Egypt beyond the guidebooks. Browse through curated
-            stories, vibrant cultures, and stunning destinations waiting for
-            your arrival
-          </p>
-          <div className="explore-cards">
-            <div className="explore-card">
-              <img src={alexandria} alt="Alexandria" />
-              <div className="explore-overlay">
-                <span className="explore-name">Alexandria</span>
-                <span className="explore-rating">⭐ 4.9</span>
-              </div>
-              <button className="arrow-btn">
-                <img src={Arrow} alt="arrow" />
-              </button>
-            </div>
-            <div className="explore-card featured-explore">
-              <img src={marsaMatrouh} alt="Marsa Matrouh" />
-              <div className="explore-overlay">
-                <span className="explore-name">Marsa Matrouh</span>
-                <span className="explore-rating">⭐ 4.9</span>
-              </div>
-              <button className="arrow-btn">
-                <img src={Arrow} alt="arrow" />
-              </button>
-            </div>
-            <div className="explore-card">
-              <img src={hurghada} alt="Hurghada" />
-              <div className="explore-overlay">
-                <span className="explore-name">Hurghada</span>
-                <span className="explore-rating">⭐ 4.9</span>
-              </div>
-              <button className="arrow-btn">
-                <img src={Arrow} alt="arrow" />
-              </button>
-            </div>
-          </div>
-          <button className="more-btn" onClick={() => setShowSignUpModal(true)}>
-            Explore More ↗
-          </button>
-        </div>
-      </div> */}
-
-      {/* ===== Exclusive Travel Packages Section ===== */}
+      {/* ===== Popular AI Itineraries Section ===== */}
       <div className="packages-section">
         <div className="packages-content">
           <h2>
@@ -578,24 +515,16 @@ const Home = () => {
               </div>
             </div>
           </div>
-          <button className="more-packages-btn">Create Your Own Trip</button>
+          {/* ✅ Create Your Own Trip → يفتح Sign Up Modal */}
+          <button
+            className="more-packages-btn"
+            onClick={() => setShowSignUpModal(true)}
+          >
+            Create Your Own Trip
+          </button>
         </div>
       </div>
-      <p
-        onClick={() => setShowSignUpModal(true)}
-        style={{
-          position: "fixed",
-          bottom: 20,
-          right: 20,
-          background: "red",
-          color: "white",
-          padding: "10px",
-          zIndex: 9999,
-          cursor: "pointer",
-        }}
-      >
-        TEST MODAL
-      </p>
+
       {/* ===== Testimonials Section ===== */}
       <div className="testimonials-section">
         <h2 className="testimonials-title">

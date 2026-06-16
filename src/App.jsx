@@ -12,6 +12,7 @@ import AiPlanner from "./components/pages/AiPlanner";
 import Landing from "./components/pages/Landing";
 import CalendarPage from "./components/pages/Calendar";
 import AboutUs from "./components/pages/AboutUs.jsx";
+import Interests from "./components/pages/Interests";
 
 function App() {
   const [currentPage, setCurrentPage] = useState(() => {
@@ -27,6 +28,7 @@ function App() {
     if (path === "/home") return "home";
     if (path === "/calendar") return "calendar";
     if (path === "/about-us") return "aboutus";
+    if (path === "/interests") return "interests";
     return "landing";
   });
 
@@ -45,6 +47,7 @@ function App() {
       else if (path === "/home") setCurrentPage("home");
       else if (path === "/calendar") setCurrentPage("calendar");
       else if (path === "/about-us") setCurrentPage("aboutus");
+      else if (path === "/interests") setCurrentPage("interests");
       else setCurrentPage("landing");
     };
 
@@ -62,8 +65,8 @@ function App() {
       window.scrollTo({ top: 0, behavior: "smooth" });
     };
     window.navigateToDashboard = () => {
-      window.history.pushState({}, "", "/home");
-      setCurrentPage("home");
+      window.history.pushState({}, "", "/interests");
+      setCurrentPage("interests");
       window.scrollTo({ top: 0, behavior: "smooth" });
     };
     window.navigateToSignIn = () => {
@@ -116,6 +119,11 @@ function App() {
       setCurrentPage("aboutus");
       window.scrollTo({ top: 0, behavior: "smooth" });
     };
+    window.navigateToInterests = () => {
+      window.history.pushState({}, "", "/interests");
+      setCurrentPage("interests");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    };
 
     return () => {
       window.removeEventListener("popstate", updatePageFromPath);
@@ -132,6 +140,7 @@ function App() {
       delete window.navigateToAiPlanner;
       delete window.navigateToCalendar;
       delete window.navigateToAboutUs;
+      delete window.navigateToInterests;
     };
   }, []);
 
@@ -161,6 +170,8 @@ function App() {
         return <CalendarPage />;
       case "aboutus":
         return <AboutUs />;
+      case "interests":
+        return <Interests />;
       default:
         return <Landing onNavigate={setCurrentPage} />;
     }
