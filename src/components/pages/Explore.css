@@ -76,7 +76,7 @@
   justify-content: center;
   padding: 0 60px;
   text-align: center;
-  margin-left: 15%;
+  /* removed margin-left: 15% — centers the search bar properly */
   pointer-events: none;
 }
 
@@ -84,7 +84,9 @@
   font-size: 48px;
   font-weight: 700;
   margin-bottom: 40px;
+  margin-left: 160px;
   letter-spacing: -1px;
+  /* aligns to the left edge of the search bar below it */
   align-self: flex-start;
   text-align: left;
   pointer-events: none;
@@ -94,7 +96,7 @@
   display: flex;
   gap: 16px;
   align-items: center;
-  width: 100%;
+  width: 80%;
   background: white;
   padding: 16px;
   border-radius: 12px;
@@ -1336,9 +1338,10 @@
 .ai-magic-grid {
   display: grid;
   grid-template-columns: 2fr 1fr 1fr;
-  grid-template-rows: minmax(280px, auto) minmax(220px, auto);
+  /* explicit row heights so cards never overflow their container */
+  grid-template-rows: 300px 280px;
   gap: 30px;
-  max-height: 920px;
+  /* removed max-height — it was clipping rows and pushing cards over the footer */
 }
 
 .ai-magic-card {
@@ -1346,7 +1349,8 @@
   overflow: hidden;
   border-radius: 22px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
-  min-height: 280px;
+  /* height: 100% so the card stretches to fill its explicit grid row */
+  height: 100%;
   transition:
     transform 0.25s ease,
     box-shadow 0.25s ease;
@@ -1360,35 +1364,31 @@
 .ai-magic-card-large {
   grid-column: 1 / 3;
   grid-row: 1 / 2;
-  min-height: 280px;
 }
 
 .ai-magic-card:nth-child(2) {
   grid-column: 3 / 4;
   grid-row: 1 / 2;
-  min-height: 280px;
 }
 
 .ai-magic-card:nth-child(3) {
   grid-column: 1 / 2;
   grid-row: 2 / 3;
-  min-height: 280px;
 }
 
 .ai-magic-card:nth-child(4) {
   grid-column: 2 / 3;
   grid-row: 2 / 3;
-  min-height: 280px;
 }
 
 .ai-magic-card:nth-child(5) {
   grid-column: 3 / 4;
   grid-row: 2 / 3;
-  min-height: 280px;
 }
 
 .ai-magic-img-wrap {
-  position: relative;
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
 }

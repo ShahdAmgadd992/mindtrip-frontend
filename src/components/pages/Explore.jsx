@@ -634,7 +634,7 @@ const Explore = () => {
       >
         <div className="overlay" />
         <Navbar activePage="explore" />
-        <div className="explore-content" style={{ marginLeft: "15%" }}>
+        <div className="explore-content">
           <h1>Discover more</h1>
           <div className="search-container">
             <div className="custom-select-wrapper" ref={dropdownRef}>
