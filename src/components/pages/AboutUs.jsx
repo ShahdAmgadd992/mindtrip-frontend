@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import "./AboutUs.css";
 import Navbar from "../layout/Navbar";
 import aboutHero from "../../assets/general/About.png";

@@ -88,12 +88,9 @@ const UserHome = () => {
     const handleScroll = () => {
       const scrolled = window.scrollY;
       const heroContent = document.querySelector(".uh-hero-content");
-      const stats = document.querySelector(".uh-stats");
-      if (heroContent && stats) {
+      if (heroContent) {
         heroContent.style.transform = `translateY(${scrolled * 0.3}px)`;
         heroContent.style.opacity = 1 - scrolled / 600;
-        stats.style.transform = `translateY(${scrolled * 0.2}px)`;
-        stats.style.opacity = 1 - scrolled / 500;
       }
     };
     window.addEventListener("scroll", handleScroll);
