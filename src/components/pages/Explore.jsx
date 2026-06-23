@@ -289,7 +289,21 @@ const TrendingCard = ({ item }) => (
         {item.city}
       </p>
       <p className="trending-card-description">{item.description}</p>
-      <button className="trending-visit-btn">Visit Now</button>
+      <button
+        className="trending-visit-btn"
+        onClick={() =>
+          window.navigateToTripDetails &&
+          window.navigateToTripDetails({
+            ...item,
+            category: "attraction",
+            rating: 4.7,
+            reviews: 120,
+            price: 0,
+          })
+        }
+      >
+        Visit Now
+      </button>{" "}
     </div>
   </div>
 );
@@ -301,7 +315,21 @@ const AIMagicCard = ({ item }) => (
       <div className="ai-magic-img-overlay" />
       <div className="ai-magic-card-content">
         <h3 className="ai-magic-title">{item.title}</h3>
-        <button className="ai-magic-action-btn">View Now</button>
+        <button
+          className="ai-magic-action-btn"
+          onClick={() =>
+            window.navigateToTripDetails &&
+            window.navigateToTripDetails({
+              ...item,
+              category: "attraction",
+              rating: 4.7,
+              reviews: 100,
+              price: 0,
+            })
+          }
+        >
+          View Now
+        </button>
       </div>
     </div>
   </div>
@@ -336,7 +364,18 @@ const UniqueExperienceCard = ({ item }) => (
       <h3 className="unique-exp-title">{item.title}</h3>
       <p className="unique-exp-vibe">Vibe: {item.vibe}</p>
       <p className="unique-exp-reviews">({item.reviews} reviews)</p>
-      <button className="unique-exp-btn">More Details</button>
+      <button
+        className="unique-exp-btn"
+        onClick={() =>
+          window.navigateToTripDetails &&
+          window.navigateToTripDetails({
+            ...item,
+            category: "attraction",
+          })
+        }
+      >
+        More Details
+      </button>{" "}
     </div>
   </div>
 );

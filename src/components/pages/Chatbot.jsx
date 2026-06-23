@@ -19,7 +19,7 @@ const EMPTY_COLLECTED = {
 const hasAnyValue = (obj) =>
   !!obj &&
   Object.values(obj).some((v) =>
-    Array.isArray(v) ? v.length > 0 : v !== null && v !== undefined && v !== ""
+    Array.isArray(v) ? v.length > 0 : v !== null && v !== undefined && v !== "",
   );
 
 // ─── Trip Summary Card ────────────────────────────────────────────────────────
@@ -31,14 +31,7 @@ const hasAnyValue = (obj) =>
 const TripSummaryCard = ({ summary, onViewPlan }) => {
   if (!summary) return null;
 
-  const {
-    image,
-    destination,
-    days,
-    nights,
-    people,
-    budget,
-  } = summary;
+  const { image, destination, days, nights, people, budget } = summary;
 
   const nightsLabel = nights ?? (days ? days - 1 : null);
 
@@ -74,7 +67,9 @@ const TripSummaryCard = ({ summary, onViewPlan }) => {
             <span className="chat-trip-card__icon">🗓</span>
             <span>
               <strong>Duration:</strong> {days} {days === 1 ? "Day" : "Days"}
-              {nightsLabel != null ? `, ${nightsLabel} ${nightsLabel === 1 ? "Night" : "Nights"}` : ""}
+              {nightsLabel != null
+                ? `, ${nightsLabel} ${nightsLabel === 1 ? "Night" : "Nights"}`
+                : ""}
             </span>
           </p>
         )}
@@ -91,7 +86,9 @@ const TripSummaryCard = ({ summary, onViewPlan }) => {
             <span className="chat-trip-card__icon">💰</span>
             <span>
               <strong>Est. Budget:</strong>{" "}
-              <span className="chat-trip-card__budget">*{budget} EGP / person</span>
+              <span className="chat-trip-card__budget">
+                *{budget} EGP / person
+              </span>
             </span>
           </p>
         )}
@@ -113,7 +110,11 @@ const BudgetBreakdown = ({ breakdown }) => {
     { label: "Transport", icon: "🚌", value: breakdown.transport },
     { label: "Activities", icon: "🎯", value: breakdown.activities },
     { label: "Meals", icon: "🍽️", value: breakdown.meals },
-    { label: "Entry fees", icon: "🎟️", value: breakdown.entryFees ?? breakdown.entry_fees },
+    {
+      label: "Entry fees",
+      icon: "🎟️",
+      value: breakdown.entryFees ?? breakdown.entry_fees,
+    },
   ].filter((i) => i.value != null);
 
   if (!items.length) return null;
@@ -159,7 +160,7 @@ const ChatBot = ({
   onClose,
   userId = "guest",
   initialCollected = null,
-  onTripReady,       // ← NEW: parent callback
+  onTripReady, // ← NEW: parent callback
 }) => {
   const startedFromSelections = hasAnyValue(initialCollected);
 
@@ -176,8 +177,8 @@ const ChatBot = ({
   });
 
   // Trip summary card state — shown once plan is ready
-  const [tripSummary, setTripSummary] = useState(null);    // { destination, days, nights, people, budget, image }
-  const [tripPlanData, setTripPlanData] = useState(null);  // full TripResult-compatible object
+  const [tripSummary, setTripSummary] = useState(null); // { destination, days, nights, people, budget, image }
+  const [tripPlanData, setTripPlanData] = useState(null); // full TripResult-compatible object
   const [budgetBreakdown, setBudgetBreakdown] = useState(null);
 
   const bottomRef = useRef(null);
@@ -209,17 +210,13 @@ const ChatBot = ({
       rawData?.city ??
       null;
 
-    const days =
-      currentCollected?.days ??
-      rawData?.days ??
-      null;
+    const days = currentCollected?.days ?? rawData?.days ?? null;
 
     const nights = days ? days - 1 : null;
 
-    const people =
-      currentCollected?.people
-        ? `${currentCollected.people} ${currentCollected.people === 1 ? "Person" : "People"}`
-        : rawData?.people
+    const people = currentCollected?.people
+      ? `${currentCollected.people} ${currentCollected.people === 1 ? "Person" : "People"}`
+      : rawData?.people
         ? `${rawData.people} ${rawData.people === 1 ? "Person" : "People"}`
         : null;
 
@@ -239,7 +236,9 @@ const ChatBot = ({
         const dayData = plan[`day${d}`];
         if (!dayData) continue;
         for (const slot of ["morning", "afternoon", "evening"]) {
-          const photo = (dayData[slot] ?? []).find((p) => p?.photo_url)?.photo_url;
+          const photo = (dayData[slot] ?? []).find(
+            (p) => p?.photo_url,
+          )?.photo_url;
           if (photo) return photo;
         }
       }
@@ -249,7 +248,8 @@ const ChatBot = ({
     const image = findFirstPhoto(rawData) ?? FALLBACK_IMG;
 
     // Budget breakdown
-    const breakdown = rawData?.budget_breakdown ?? data?.budget_breakdown ?? null;
+    const breakdown =
+      rawData?.budget_breakdown ?? data?.budget_breakdown ?? null;
     if (breakdown) setBudgetBreakdown(breakdown);
 
     // Build itinerary for TripResult
@@ -263,7 +263,9 @@ const ChatBot = ({
 
       const slots = ["morning", "afternoon", "evening"].map((slot) => {
         const items = dayData?.[slot] ?? [];
-        const titles = items.map((p) => p?.name ?? p?.title ?? "").filter(Boolean);
+        const titles = items
+          .map((p) => p?.name ?? p?.title ?? "")
+          .filter(Boolean);
         return {
           time: slot.charAt(0).toUpperCase() + slot.slice(1),
           title: titles[0] ?? `${slot} activities`,
@@ -275,17 +277,15 @@ const ChatBot = ({
       dayDetails[d] = slots;
 
       const allItems = ["morning", "afternoon", "evening"].flatMap(
-        (s) => dayData?.[s] ?? []
+        (s) => dayData?.[s] ?? [],
       );
       const tags = [
-        ...new Set(
-          allItems.map((p) => p?.category ?? p?.type).filter(Boolean)
-        ),
+        ...new Set(allItems.map((p) => p?.category ?? p?.type).filter(Boolean)),
       ].slice(0, 3);
 
       const dayCost = allItems.reduce(
         (sum, p) => sum + (p?.cost ?? p?.price ?? 0),
-        0
+        0,
       );
 
       const firstImg =
@@ -340,7 +340,35 @@ const ChatBot = ({
       fullTripPlan,
     };
   };
+  const tryExtractSummaryFromText = (text, currentCollected) => {
+    // لازم كل المعلومات الأساسية تكون موجودة الأول
+    const isComplete =
+      currentCollected?.destination &&
+      currentCollected?.days &&
+      currentCollected?.budget &&
+      currentCollected?.people;
 
+    if (!isComplete) return null;
+
+    // وبعدين نتأكد إن الـ AI قال إن الـ plan جاهز
+    const hasConfirmation =
+      /plan(?:ning|ned)?|itinerary|get ready|you(?:'re| are) all set|here(?:'s| is) your/i.test(
+        text,
+      );
+    if (!hasConfirmation) return null;
+
+    return {
+      destination: currentCollected?.destination ?? null,
+      days: currentCollected?.days ?? null,
+      nights: currentCollected?.days ? currentCollected.days - 1 : null,
+      people: currentCollected?.people
+        ? `${currentCollected.people} ${currentCollected.people === 1 ? "Person" : "People"}`
+        : null,
+      budget: currentCollected?.budget ?? null,
+      image:
+        "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=400&q=80",
+    };
+  };
   // ── Kickoff ───────────────────────────────────────────────────────────────
 
   const kickoffConversation = async () => {
@@ -389,11 +417,20 @@ const ChatBot = ({
       ]);
 
       // Check if plan is immediately ready (e.g. user had all info pre-filled)
+
       if (data?.status === "complete" || data?.status === "plan_ready") {
         const mergedCollected = { ...collected, ...(data.collected ?? {}) };
-        const { summary, fullTripPlan } = parsePlanFromResponse(data, mergedCollected);
+        const { summary, fullTripPlan } = parsePlanFromResponse(
+          data,
+          mergedCollected,
+        );
         setTripSummary(summary);
         setTripPlanData(fullTripPlan);
+      } else {
+        const fallbackSummary = tryExtractSummaryFromText(reply, collected);
+        if (fallbackSummary && fallbackSummary.destination) {
+          setTripSummary(fallbackSummary);
+        }
       }
     } catch (err) {
       const errorMsg =
@@ -426,7 +463,12 @@ const ChatBot = ({
       hour: "2-digit",
       minute: "2-digit",
     });
-    const userMsg = { id: Date.now(), from: "user", text: inputVal.trim(), time: now };
+    const userMsg = {
+      id: Date.now(),
+      from: "user",
+      text: inputVal.trim(),
+      time: now,
+    };
     setMessages((prev) => [...prev, userMsg]);
     setInputVal("");
     setIsTyping(true);
@@ -484,9 +526,18 @@ const ChatBot = ({
 
       // ── Plan ready → show the Trip Summary Card ──
       if (data?.status === "complete" || data?.status === "plan_ready") {
-        const { summary, fullTripPlan } = parsePlanFromResponse(data, mergedCollected);
+        const mergedCollected = { ...collected, ...(data.collected ?? {}) };
+        const { summary, fullTripPlan } = parsePlanFromResponse(
+          data,
+          mergedCollected,
+        );
         setTripSummary(summary);
         setTripPlanData(fullTripPlan);
+      } else {
+        const fallbackSummary = tryExtractSummaryFromText(reply, collected);
+        if (fallbackSummary && fallbackSummary.destination) {
+          setTripSummary(fallbackSummary);
+        }
       }
     } catch (err) {
       const errorMsg =
@@ -532,20 +583,28 @@ const ChatBot = ({
   return (
     <div className="chatbot-overlay" onClick={onClose}>
       <div className="chatbot-panel" onClick={(e) => e.stopPropagation()}>
-
         {/* Header */}
         <div className="chatbot-header">
-          <button className="chatbot-back-btn" onClick={onClose}>←</button>
+          <button className="chatbot-back-btn" onClick={onClose}>
+            ←
+          </button>
           <h2 className="chatbot-title">Hello, {userName}</h2>
         </div>
 
         {/* Messages */}
         <div className="chatbot-messages">
           {messages.map((msg) => (
-            <div key={msg.id} className={`chatbot-msg-row chatbot-msg-row--${msg.from}`}>
+            <div
+              key={msg.id}
+              className={`chatbot-msg-row chatbot-msg-row--${msg.from}`}
+            >
               {msg.from === "ai" && (
                 <div className="chatbot-avatar">
-                  <img src={chatIconImg} alt="AI" className="chatbot-avatar-icon" />
+                  <img
+                    src={chatIconImg}
+                    alt="AI"
+                    className="chatbot-avatar-icon"
+                  />
                 </div>
               )}
               <div className="chatbot-bubble-wrap">
@@ -571,7 +630,11 @@ const ChatBot = ({
           {isTyping && (
             <div className="chatbot-msg-row chatbot-msg-row--ai">
               <div className="chatbot-avatar">
-                <img src={chatIconImg} alt="AI" className="chatbot-avatar-icon" />
+                <img
+                  src={chatIconImg}
+                  alt="AI"
+                  className="chatbot-avatar-icon"
+                />
               </div>
               <div className="chatbot-bubble-wrap">
                 <div className="chatbot-sender-info">
@@ -595,7 +658,11 @@ const ChatBot = ({
               {/* The card itself */}
               <div className="chatbot-msg-row chatbot-msg-row--ai">
                 <div className="chatbot-avatar">
-                  <img src={chatIconImg} alt="AI" className="chatbot-avatar-icon" />
+                  <img
+                    src={chatIconImg}
+                    alt="AI"
+                    className="chatbot-avatar-icon"
+                  />
                 </div>
                 <div className="chatbot-bubble-wrap" style={{ width: "100%" }}>
                   <div className="chatbot-sender-info">
