@@ -17,6 +17,7 @@ import Interests from "./components/pages/Interests";
 import UserHome from "./components/pages/UserHome";
 import SavedPlaces from "./components/pages/SavedPlaces";
 import TripDetails from "./components/pages/TripDetails";
+import { SavedPlacesProvider } from "./context/SavedPlacesContext";
 
 function App() {
   const [currentPage, setCurrentPage] = useState(() => {
@@ -225,7 +226,9 @@ function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
-        <div style={{ width: "100%", overflowY: "auto" }}>{renderPage()}</div>
+        <SavedPlacesProvider>
+          <div style={{ width: "100%", overflowY: "auto" }}>{renderPage()}</div>
+        </SavedPlacesProvider>
       </AuthProvider>
     </BrowserRouter>
   );

@@ -16,6 +16,7 @@ import heritageImg3 from "../../assets/explore/karnak-temple.jpg";
 import heritageImg4 from "../../assets/explore/valley-of-the-kings.jpg";
 import heritageImg5 from "../../assets/explore/saqqara-step-pyramid.jpg";
 import heritageImg6 from "../../assets/explore/philae-temple.jpg";
+import { useSavedPlaces } from "../../context/SavedPlacesContext";
 
 import { MapContainer, TileLayer, Circle, Tooltip } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
@@ -199,9 +200,21 @@ const trendingDestinations = [
   },
 ];
 
-// ✅ FIX: selectedCategories passed as prop instead of being read from closure
 const TourCard = ({ tour, selectedCategories = [] }) => {
-  const [liked, setLiked] = useState(false);
+  const context = useSavedPlaces();
+  console.log("🔍 context:", context);
+  const { toggleSaved, isSaved } = useSavedPlaces();
+  const liked = isSaved(tour.id);
+
+  const handleToggle = () => {
+    const type = selectedCategories.includes("Hotels & Stays")
+      ? "Hotels"
+      : selectedCategories.includes("Restaurants & Cafes")
+        ? "Restaurants"
+        : "Trips";
+    toggleSaved({ ...tour, placeType: type });
+  };
+
   return (
     <div className="tour-card">
       <div className="tour-card-img-wrap">
@@ -215,9 +228,18 @@ const TourCard = ({ tour, selectedCategories = [] }) => {
         )}
         <button
           className={`fav-btn ${liked ? "liked" : ""}`}
-          onClick={() => setLiked(!liked)}
+          onClick={handleToggle}
         >
-          <img src={favList} alt="favourite" />
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill={liked ? "#e63946" : "none"}
+            stroke={liked ? "#e63946" : "#aaa"}
+            strokeWidth="2"
+          >
+            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+          </svg>
         </button>
       </div>
       <div className="tour-card-body">
@@ -249,7 +271,6 @@ const TourCard = ({ tour, selectedCategories = [] }) => {
         <button
           className="tour-card-view-btn"
           onClick={() => {
-            // ✅ FIX: now uses the prop correctly
             const cat = selectedCategories.includes("Hotels & Stays")
               ? "hotel"
               : selectedCategories.includes("Restaurants & Cafes")
@@ -265,7 +286,6 @@ const TourCard = ({ tour, selectedCategories = [] }) => {
     </div>
   );
 };
-
 const TrendingCard = ({ item }) => (
   <div
     className="trending-card"
