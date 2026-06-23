@@ -1,9 +1,11 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Navbar from "../layout/Navbar";
 import Footer from "../layout/Footer";
 import ReviewsIcon from "../../assets/icons/ReviewsIcon.png";
 import "./TripDetails.css";
 import tripService from "../../services/tripService";
+import mapboxgl from "mapbox-gl";
+import "mapbox-gl/dist/mapbox-gl.css";
 
 const TripDetails = ({ place }) => {
   const [liked, setLiked] = useState(false);
@@ -29,6 +31,7 @@ const TripDetails = ({ place }) => {
   const [budget, setBudget] = useState("Economic");
   const [numPeople, setNumPeople] = useState(5);
   const [loadingProgress, setLoadingProgress] = useState(0);
+  const [selectedTripDetails, setSelectedTripDetails] = useState(null);
 
   // ===== Manage Trip Modal states =====
   const [showManageTripModal, setShowManageTripModal] = useState(false);
@@ -37,6 +40,11 @@ const TripDetails = ({ place }) => {
   const [manageSelectedDay, setManageSelectedDay] = useState(null);
   const [manageMoveTripId, setManageMoveTripId] = useState(null);
   const [hasOpenedManageOnce, setHasOpenedManageOnce] = useState(false);
+
+  const [apiTrips, setApiTrips] = useState([]);
+  const mapContainerRef = useRef(null);
+  const mapRef = useRef(null);
+
   useEffect(() => {
     tripService
       .getTrips({ Page: 1, PageSize: 20 })
@@ -46,7 +54,120 @@ const TripDetails = ({ place }) => {
       })
       .catch((err) => console.error("Failed to load trips:", err));
   }, []);
-  const [apiTrips, setApiTrips] = useState([]);
+  useEffect(() => {
+    if (!mapContainerRef.current) return;
+
+    // ✅ شيلي الـ map القديمة لو موجودة
+    if (mapRef.current) {
+      mapRef.current.remove();
+      mapRef.current = null;
+    }
+
+    // ✅ accessToken
+    mapboxgl.accessToken =
+      "pk.eyJ1IjoieG1vaGFtZWR4IiwiYSI6ImNtcG1zZ25kbTB4eTkydHNidXZ2cnR2ajkifQ.CugdwmFa8ME2UU4rDEAJug";
+
+    // ✅ allLocations متعرفة هنا
+    const allLocations = [];
+
+    if (selectedTripDetails?.days) {
+      selectedTripDetails.days.forEach((day) => {
+        day.locations?.forEach((loc) => {
+          allLocations.push({
+            lat: loc.latitude,
+            lng: loc.longitude,
+            name: loc.nameEn || loc.nameAr || "Location",
+            day: day.dayNumber,
+          });
+        });
+      });
+    }
+
+    if (allLocations.length === 0) {
+      allLocations.push({
+        lat: place?.latitude ?? 29.9792,
+        lng: place?.longitude ?? 31.1342,
+        name: place?.title ?? "Location",
+        day: 1,
+      });
+    }
+
+    const centerLat = allLocations[0].lat;
+    const centerLng = allLocations[0].lng;
+
+    mapRef.current = new mapboxgl.Map({
+      container: mapContainerRef.current,
+      style: "mapbox://styles/mapbox/streets-v12",
+      center: [centerLng, centerLat],
+      zoom: allLocations.length === 1 ? 13 : 10,
+    });
+
+    mapRef.current.on("load", () => {
+      if (allLocations.length > 1) {
+        const coordinates = allLocations.map((loc) => [loc.lng, loc.lat]);
+        mapRef.current.addSource("route", {
+          type: "geojson",
+          data: {
+            type: "Feature",
+            geometry: { type: "LineString", coordinates },
+          },
+        });
+        mapRef.current.addLayer({
+          id: "route",
+          type: "line",
+          source: "route",
+          layout: { "line-join": "round", "line-cap": "round" },
+          paint: {
+            "line-color": "#5596fe",
+            "line-width": 3,
+            "line-dasharray": [2, 1],
+          },
+        });
+      }
+
+      allLocations.forEach((loc) => {
+        const el = document.createElement("div");
+        el.style.cssText = `
+        width: 28px; height: 28px;
+        background: #5596fe; border: 2px solid #fff;
+        border-radius: 50%; display: flex;
+        align-items: center; justify-content: center;
+        color: white; font-size: 11px; font-weight: 700;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.3); cursor: pointer;
+      `;
+        el.textContent = loc.day;
+
+        new mapboxgl.Marker({ element: el })
+          .setLngLat([loc.lng, loc.lat])
+          .setPopup(
+            new mapboxgl.Popup({ offset: 25 }).setHTML(`
+            <div style="font-size:13px; font-weight:600; color:#1f2937;">
+              Day ${loc.day}: ${loc.name}
+            </div>
+          `),
+          )
+          .addTo(mapRef.current);
+      });
+
+      if (allLocations.length > 1) {
+        const bounds = allLocations.reduce(
+          (b, loc) => b.extend([loc.lng, loc.lat]),
+          new mapboxgl.LngLatBounds(
+            [allLocations[0].lng, allLocations[0].lat],
+            [allLocations[0].lng, allLocations[0].lat],
+          ),
+        );
+        mapRef.current.fitBounds(bounds, { padding: 40 });
+      }
+    });
+
+    mapRef.current.addControl(new mapboxgl.NavigationControl(), "top-right");
+
+    return () => {
+      mapRef.current?.remove();
+      mapRef.current = null;
+    };
+  }, [place, selectedTripDetails]);
 
   // ===== Toast helper =====
   const showToastMsg = (msg) => {
@@ -713,13 +834,14 @@ const TripDetails = ({ place }) => {
                   Location
                 </h3>
                 <div className="td-map-placeholder">
-                  <iframe
-                    title="map"
-                    width="100%"
-                    height="200"
-                    style={{ border: 0, borderRadius: "12px" }}
-                    loading="lazy"
-                    src={`https://maps.google.com/maps?q=${data.lat},${data.lng}&z=14&output=embed`}
+                  <div
+                    ref={mapContainerRef}
+                    style={{
+                      width: "100%",
+                      height: "200px",
+                      borderRadius: "12px",
+                      overflow: "hidden",
+                    }}
                   />
                 </div>
                 <a
@@ -926,7 +1048,13 @@ const TripDetails = ({ place }) => {
                 } catch (err) {
                   console.error("Failed to add place to trip:", err);
                 }
-
+                try {
+                  const tripDetails =
+                    await tripService.getTripById(selectedTrip);
+                  setSelectedTripDetails(tripDetails.data);
+                } catch (err) {
+                  console.error("Failed to load trip details:", err);
+                }
                 setAddedToTrip(true);
                 setAddedTripName(trip?.title || "your trip");
                 setShowAddTripModal(false);

@@ -59,22 +59,19 @@ const Navbar = ({ activePage = "home", style = {} }) => {
           About Us
         </li>
       </ul>
-
       <div className="nav-right">
-        {!isLoggedIn && activePage === "home" && (
+        {activePage === "home" || !isLoggedIn ? (
           <button
             className="signin-btn"
             onClick={() => window.navigateToSignIn?.()}
           >
             Sign In
           </button>
-        )}
-
-        {isLoggedIn && (
+        ) : (
           <>
             <img
               src={
-                ["home", "explore", "aboutus"].includes(activePage)
+                ["explore", "aboutus"].includes(activePage)
                   ? heartWhite
                   : heartGray
               }
