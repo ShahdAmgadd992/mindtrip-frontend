@@ -20,6 +20,8 @@ import TripDetails from "./components/pages/TripDetails";
 import { SavedPlacesProvider } from "./context/SavedPlacesContext";
 
 function App() {
+  const [exploreHiddenGems, setExploreHiddenGems] = useState(false);
+
   const [currentPage, setCurrentPage] = useState(() => {
     const path = window.location.pathname;
     if (path === "/signin" || path === "/sign-in") return "signin";
@@ -110,6 +112,12 @@ function App() {
       setCurrentPage("explore");
       window.scrollTo({ top: 0, behavior: "smooth" });
     };
+    window.navigateToExploreHiddenGems = () => {
+      setExploreHiddenGems(true);
+      window.history.pushState({}, "", "/explore");
+      setCurrentPage("explore");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    };
     window.navigateToProfile = () => {
       window.history.pushState({}, "", "/profile");
       setCurrentPage("profile");
@@ -174,6 +182,7 @@ function App() {
       delete window.navigateToVerify;
       delete window.navigateToResetPassword;
       delete window.navigateToExplore;
+      delete window.navigateToExploreHiddenGems;
       delete window.navigateToProfile;
       delete window.navigateToAiPlanner;
       delete window.navigateToCalendar;
@@ -202,7 +211,7 @@ function App() {
       case "resetPassword":
         return <ResetPassword />;
       case "explore":
-        return <Explore />;
+        return <Explore hiddenGems={exploreHiddenGems} onHiddenGemsConsumed={() => setExploreHiddenGems(false)} />;
       case "profile":
         return <Profile />;
       case "aiplanner":

@@ -43,6 +43,8 @@ const TripDetails = ({ place }) => {
   const [hasOpenedManageOnce, setHasOpenedManageOnce] = useState(false);
 
   const [apiTrips, setApiTrips] = useState([]);
+  const [cityTrips, setCityTrips] = useState([]);
+  const [cityTripsLoading, setCityTripsLoading] = useState(false);
   const { featured: nearbyFromAPI, loading: nearbyLoading } = useHomePlaces(
     place?.city || "Cairo",
   );
@@ -194,6 +196,49 @@ const TripDetails = ({ place }) => {
     };
   }, [place, selectedTripDetails]);
 
+  // ===== Fetch trips matching the place's city/governorate =====
+  const fetchCityTrips = async () => {
+    if (!place?.city) {
+      setCityTrips(apiTrips);
+      return;
+    }
+    setCityTripsLoading(true);
+    try {
+      // Use getplaces endpoint to find places in same city, then filter trips
+      const response = await fetch("/api/v1/ai/places/getplaces", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ city: place.city, pageSize: 50 }),
+      });
+      const data = await response.json();
+      const placesInCity = data?.items || data?.data || [];
+      const cityPlaceIds = new Set(placesInCity.map((p) => p.place_id || p.id));
+
+      // Filter apiTrips to those that contain at least one place in same city
+      // OR fallback: filter by trip destination/city field if available
+      const filtered = apiTrips.filter((trip) => {
+        if (trip.city && trip.city.toLowerCase() === place.city.toLowerCase())
+          return true;
+        if (trip.destination && trip.destination.toLowerCase().includes(place.city.toLowerCase()))
+          return true;
+        // Check if trip days contain places in this city
+        if (trip.days) {
+          return trip.days.some((day) =>
+            day.locations?.some((loc) => cityPlaceIds.has(loc.place_id))
+          );
+        }
+        return false;
+      });
+
+      setCityTrips(filtered.length > 0 ? filtered : apiTrips);
+    } catch (err) {
+      console.error("Failed to fetch city places:", err);
+      setCityTrips(apiTrips);
+    } finally {
+      setCityTripsLoading(false);
+    }
+  };
+
   // ===== Toast helper =====
   const showToastMsg = (msg) => {
     setToastMessage(msg);
@@ -230,7 +275,7 @@ const TripDetails = ({ place }) => {
       label2: "Closing Hours",
       val2: place?.opening_hours?.split("-")[1] || "06:00 pm",
       label3: "Entry Fee",
-      val3: place?.price ? `$${place.price}` : "Free",
+      val3: place?.price ? `${place.price} EGP` : "Free",
       label4: "Best Time",
       val4: "Morning",
     },
@@ -246,10 +291,10 @@ const TripDetails = ({ place }) => {
         reviews: `${place.reviews}`,
         avgPrice:
           category === "hotel"
-            ? `$${place.price} / Night`
+            ? `${place.price} EGP / Night`
             : category === "attraction"
-              ? `Entry $${place.price}`
-              : `Avg. $${place.price} / Meal`,
+              ? `Entry ${place.price} EGP`
+              : `Avg. ${place.price} EGP / Meal`,
         images: place.image_urls?.length ? place.image_urls : [place.image],
         overview:
           place.description ||
@@ -294,7 +339,7 @@ const TripDetails = ({ place }) => {
         city: "Dahab",
         rating: 4.5,
         reviews: "2.7k",
-        avgPrice: "Avg. $50 / Meal",
+        avgPrice: "Avg. 50 EGP / Meal",
         images: [
           "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=800",
           "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=600",
@@ -862,6 +907,7 @@ const TripDetails = ({ place }) => {
                       }
                     } else {
                       setShowAddTripModal(true);
+                      fetchCityTrips();
                     }
                   }}
                 >
@@ -918,77 +964,92 @@ const TripDetails = ({ place }) => {
             <p className="td-add-trip-modal-sub">
               Select an itinerary to add {data.name}
             </p>
+            {place?.city && (
+              <p className="td-add-trip-city-filter">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#5596fe" strokeWidth="2">
+                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/>
+                </svg>
+                Showing trips in <strong>{place.city}</strong>
+              </p>
+            )}
             <div className="td-add-trip-list">
-              {(apiTrips.length > 0
-                ? apiTrips
-                : [
-                    {
-                      id: 1,
-                      title: "Dahab Tour",
-                      durationDays: 3,
-                      coverImage:
-                        "https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=200",
-                    },
-                    {
-                      id: 2,
-                      title: "Egypt Adventure",
-                      durationDays: 3,
-                      coverImage:
-                        "https://images.unsplash.com/photo-1553913861-c0fddf2619ee?w=200",
-                    },
-                    {
-                      id: 3,
-                      title: "Aswan Heritage Tour",
-                      durationDays: 3,
-                      coverImage:
-                        "https://images.unsplash.com/photo-1539768942893-daf53e448371?w=200",
-                    },
-                  ]
-              ).map((trip) => (
-                <div
-                  key={trip.id}
-                  className={`td-trip-option ${selectedTrip === trip.id ? "selected" : ""}`}
-                  onClick={() => setSelectedTrip(trip.id)}
-                >
-                  <input
-                    type="radio"
-                    className="td-trip-radio"
-                    checked={selectedTrip === trip.id}
-                    onChange={() => setSelectedTrip(trip.id)}
-                  />
-                  <img
-                    src={
-                      trip.coverImage ||
-                      trip.image ||
-                      "https://images.unsplash.com/photo-1553913861-c0fddf2619ee?w=200"
-                    }
-                    alt={trip.title}
-                    className="td-trip-img"
-                  />
-                  <div className="td-trip-info">
-                    <span className="td-trip-name">{trip.title}</span>
-                    <span className="td-trip-meta">
-                      {trip.durationDays || 3} days
-                    </span>
-                  </div>
-                  {selectedTrip === trip.id && (
-                    <div className="td-day-select-wrap">
-                      <span className="td-day-select-label">
-                        Day Selection :
-                      </span>
-                      <select className="td-day-select">
-                        <option>Auto-assign ✨</option>
-                        {Array.from(
-                          { length: trip.durationDays || 3 },
-                          (_, i) => (
-                            <option key={i + 1}>Day {i + 1}</option>
-                          ),
-                        )}
-                      </select>
-                    </div>
-                  )}
+              {cityTripsLoading ? (
+                <div className="td-trips-loading">
+                  <div className="td-trips-spinner" />
+                  <span>Loading trips in {place?.city}...</span>
                 </div>
-              ))}
+              ) : (
+                (cityTrips.length > 0
+                  ? cityTrips
+                  : [
+                      {
+                        id: 1,
+                        title: "Dahab Tour",
+                        durationDays: 3,
+                        coverImage:
+                          "https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=200",
+                      },
+                      {
+                        id: 2,
+                        title: "Egypt Adventure",
+                        durationDays: 3,
+                        coverImage:
+                          "https://images.unsplash.com/photo-1553913861-c0fddf2619ee?w=200",
+                      },
+                      {
+                        id: 3,
+                        title: "Aswan Heritage Tour",
+                        durationDays: 3,
+                        coverImage:
+                          "https://images.unsplash.com/photo-1539768942893-daf53e448371?w=200",
+                      },
+                    ]
+                ).map((trip) => (
+                  <div
+                    key={trip.id}
+                    className={`td-trip-option ${selectedTrip === trip.id ? "selected" : ""}`}
+                    onClick={() => setSelectedTrip(trip.id)}
+                  >
+                    <input
+                      type="radio"
+                      className="td-trip-radio"
+                      checked={selectedTrip === trip.id}
+                      onChange={() => setSelectedTrip(trip.id)}
+                    />
+                    <img
+                      src={
+                        trip.coverImage ||
+                        trip.image ||
+                        "https://images.unsplash.com/photo-1553913861-c0fddf2619ee?w=200"
+                      }
+                      alt={trip.title}
+                      className="td-trip-img"
+                    />
+                    <div className="td-trip-info">
+                      <span className="td-trip-name">{trip.title}</span>
+                      <span className="td-trip-meta">
+                        {trip.durationDays || 3} days
+                      </span>
+                    </div>
+                    {selectedTrip === trip.id && (
+                      <div className="td-day-select-wrap">
+                        <span className="td-day-select-label">
+                          Day Selection :
+                        </span>
+                        <select className="td-day-select">
+                          <option>Auto-assign ✨</option>
+                          {Array.from(
+                            { length: trip.durationDays || 3 },
+                            (_, i) => (
+                              <option key={i + 1}>Day {i + 1}</option>
+                            ),
+                          )}
+                        </select>
+                      </div>
+                    )}
+                  </div>
+                ))
+              )}
               <div
                 className="td-trip-option td-create-new"
                 onClick={() =>
@@ -1007,8 +1068,8 @@ const TripDetails = ({ place }) => {
               onClick={async () => {
                 if (!selectedTrip) return;
                 const trip = (
-                  apiTrips.length > 0
-                    ? apiTrips
+                  cityTrips.length > 0
+                    ? cityTrips
                     : [
                         { id: 1, title: "Dahab Tour" },
                         { id: 2, title: "Egypt Adventure" },

@@ -393,3 +393,44 @@ body {
   height: 100%;
   overflow-x: hidden;
 }
+
+/* ===== Slider Arrows ===== */
+.packages-slider-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.slider-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10;
+  background: white;
+  border: none;
+  border-radius: 50%;
+  width: 44px;
+  height: 44px;
+  font-size: 28px;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  color: #5596fe;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s, color 0.2s, transform 0.2s;
+}
+
+.slider-arrow:hover {
+  background: #5596fe;
+  color: white;
+  transform: translateY(-50%) scale(1.08);
+}
+
+.slider-arrow-left {
+  left: -22px;
+}
+
+.slider-arrow-right {
+  right: -22px;
+}

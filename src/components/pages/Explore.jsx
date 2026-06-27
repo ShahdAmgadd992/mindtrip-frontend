@@ -449,7 +449,7 @@ const UniqueExperienceSection = ({ entertainmentPlaces = [] }) => {
 // ─────────────────────────────────────────────────────────────────────────────
 // Main Explore Component
 // ─────────────────────────────────────────────────────────────────────────────
-const Explore = () => {
+const Explore = ({ hiddenGems = false, onHiddenGemsConsumed }) => {
   const [searchBoxCity, setSearchBoxCity] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
@@ -462,8 +462,16 @@ const Explore = () => {
   const [tourNameSearch, setTourNameSearch] = useState("");
   const [sortBy, setSortBy] = useState("Popularity");
   const [sortDropdownOpen, setSortDropdownOpen] = useState(false);
-  const [showHiddenGems, setShowHiddenGems] = useState(false);
+  const [showHiddenGems, setShowHiddenGems] = useState(hiddenGems);
   const [selectedCategories, setSelectedCategories] = useState([]);
+
+  // Sync hiddenGems prop (e.g. when navigating from Home "View All Hidden Gems")
+  useEffect(() => {
+    if (hiddenGems) {
+      setShowHiddenGems(true);
+      onHiddenGemsConsumed?.();
+    }
+  }, [hiddenGems]);
 
   // ── All places pool fetched from API across all cities ────────────────────
   // allPlaces = { featured: [], hidden_gems: [], trending: [] } merged from all city calls

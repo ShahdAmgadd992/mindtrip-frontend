@@ -508,18 +508,19 @@
 }
 
 .aip-bot-btn {
-  width: 52px;
-  height: 52px;
+  width: 64px;
+  height: 64px;
   border-radius: 50%;
-  border: 2px solid #e5e7eb;
-  background: #fff;
+  border: none;
+  background: transparent;
   cursor: pointer;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
   transition: transform 0.2s;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 0;
+  overflow: hidden;
 }
 
 .aip-bot-btn:hover {
@@ -527,9 +528,11 @@
 }
 
 .aip-bot-btn-icon {
-  width: 28px;
-  height: 28px;
-  object-fit: contain;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  border-radius: 50%;
 }
 
 /* ── Floating bot button (result page) ── */
