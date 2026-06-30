@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import Navbar from "../layout/Navbar";
 import Footer from "../layout/Footer";
-import ChatBot from "./ChatBot";
+import ChatBot from "./Chatbot";
 import tripService from "../../services/tripService";
 import "./AiPlanner.css";
 
