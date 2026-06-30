@@ -279,45 +279,16 @@ const AiPlanner = () => {
     }
   };
 
+  // NOTE: We no longer call generate-plan with budget=1 just to "probe" a minimum
+  // budget — that fired an extra, wasteful request to the AI endpoint every time
+  // the user reached the budget step. The real budget the user picks (cards or the
+  // custom-amount input) is per-person, and is multiplied by peopleCount into a
+  // total only once, right before the actual generate-plan call in
+  // handleGeneratePlan(). If the AI returns a "budget_unfeasible" floor at that
+  // point, we surface it there instead.
   const fetchMinimumBudget = async () => {
-    setIsLoading(true);
-    setLoadingText("Calculating best prices...");
-    setPlanError(null);
-
-    const days = getTripDays();
-    const peopleCount = Math.max(1, adults + children);
-    const requestPayload = {
-      city: selectedDest,
-      days: Math.min(days, 7),
-      budget: 1,
-      people: peopleCount,
-      interests: selectedInterests.length > 0 ? selectedInterests : ["Cafe"],
-      mustInclude: "",
-    };
-
-    try {
-      const response = await withRetry(() =>
-        aiService.generatePlan(requestPayload),
-      );
-      const floorPerPerson = extractBudgetFloor(response.data, peopleCount);
-      setApiMinBudget(floorPerPerson ?? 300);
-    } catch (err) {
-      // On 503 after all retries — still extract floor if present, else use 300
-      const floorPerPerson = extractBudgetFloor(
-        err.response?.data,
-        peopleCount,
-      );
-      setApiMinBudget(floorPerPerson ?? 300);
-      if (err.response?.status === 503) {
-        setPlanError(
-          "AI service is busy. Budget estimates may not be accurate — you can still try generating.",
-        );
-      }
-    } finally {
-      setStep(5);
-      setIsLoading(false);
-      setLoadingText("Mindy is working his magic...");
-    }
+    setApiMinBudget(300);
+    setStep(5);
   };
 
   const handleGeneratePlan = async () => {
@@ -336,10 +307,22 @@ const AiPlanner = () => {
         budget: totalBudget,
         people: peopleCount,
         interests: selectedInterests.length > 0 ? selectedInterests : ["Cafe"],
-        mustInclude: "",
+        // Backend expects mustInclude as a list (List<MustIncludePlace>), not a
+        // string. Sending "" caused: "$.mustInclude: The JSON value could not be
+        // converted to System.Collections.Generic.List`1[...MustIncludePlace]".
+        mustInclude: [],
       };
 
       const response = await withRetry(() =>
+        // NOTE: do NOT wrap this in { req: requestPayload }. The backend's
+        // "The req field is required" error was an ASP.NET Core model-binding
+        // fallback message — it only shows up when the request's Content-Type
+        // isn't recognized as application/json, so the framework falls back to
+        // form binding using the controller's parameter name ("req") as a
+        // prefix. Wrapping the JSON body just hides one symptom and creates a
+        // new one (City/Days/Budget/People now "required" because they're
+        // nested). The real payload must stay flat — see apiClient.js for the
+        // Content-Type fix.
         aiService.generatePlan(requestPayload),
       );
 
