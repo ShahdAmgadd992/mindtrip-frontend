@@ -7,7 +7,7 @@ import Navbar from "../layout/Navbar";
 import Footer from "../layout/Footer";
 import { useAuth } from "../../context/useAuth";
 import ChatBot from "./ChatBot";
-import TripResult from "./TripResult";
+import TripResult from "./Tripresult";
 import "./AiPlanner.css";
 import aiService from "../../services/aiService";
 

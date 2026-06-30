@@ -18,7 +18,7 @@ import UserHome from "./components/pages/Userhome";
 import SavedPlaces from "./components/pages/SavedPlaces";
 import TripDetails from "./components/pages/TripDetails";
 import { SavedPlacesProvider } from "./context/SavedPlacesContext";
-import TripResult from "./components/pages/TripResult";
+import TripResult from "./components/pages/Tripresult";
 
 function App() {
   const [exploreHiddenGems, setExploreHiddenGems] = useState(false);
