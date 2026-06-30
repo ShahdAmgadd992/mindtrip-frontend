@@ -151,6 +151,13 @@ const sanitizePlaceFromAi = (rawPlace, dayNumber) => ({
   image_urls:    rawPlace?.image_urls || rawPlace?.photos || [],
   maps_url:      rawPlace?.maps_url || null,
   interests:     rawPlace?.interests || [],
+  // ✅ FIX: preserve the morning/afternoon/evening slot tag that parsePlan()
+  // attached. This was being dropped here, so by the time formatPlanForBackend()
+  // ran, every place had _slot === undefined and its `!p._slot` fallback rule
+  // swept ALL places (not just unslotted ones) into "morning" — collapsing the
+  // whole generated day into a single slot even though the AI response itself
+  // had them correctly split across morning/afternoon/evening.
+  _slot:         rawPlace?._slot || undefined,
 });
 
 const sanitizePlanForApi = (rawPlan) => {
@@ -355,16 +362,34 @@ export function useAddToTrip(place, { onPlanUpdated } = {}) {
       setActionLoading(true);
       setError(null);
       try {
-        const days   = Math.max(1, Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24)));
+        // ✅ FIX: inclusive day count (1 Aug → 3 Aug = 3 days, not 2).
+        // Math.ceil(diff/ms) was calculating the number of *nights* between
+        // the two dates, not the calendar days the trip spans — this made
+        // generate-plan receive days=2 for a 3-day trip, leaving the last
+        // day empty in trip-result even though durationDays (computed
+        // correctly elsewhere, e.g. Tripresult.jsx) showed 3.
+        const days   = Math.max(1, Math.round((endDate - startDate) / (1000 * 60 * 60 * 24)) + 1);
         const budget = calcBudget(budgetTier, days, people);
         const city   = place?.city || "Cairo";
+
+        // ✅ FIX: startDate/endDate arrive here as local-midnight Date objects
+        // (new Date(year, month, day) from the calendar picker in TripDetails.jsx).
+        // Calling .toISOString() directly on those converts local midnight to UTC,
+        // and in timezones ahead of UTC (e.g. Egypt, UTC+2/+3) local midnight is
+        // still the *previous* day in UTC — so the trip/hotel dates sent to the
+        // backend silently shifted one day earlier than what was actually picked
+        // on the calendar (e.g. picking 1 Sep → 3 Sep was saved as 31 Aug → 2 Sep).
+        // Build the ISO string from the same UTC-midnight date instead, using the
+        // Date object's local y/m/d (which are what the calendar picker set).
+        const toUtcMidnightIso = (d) =>
+          new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate())).toISOString();
 
         const createRes = await tripService.createTrip({
           title:                  `Trip to ${city}`,
           destinationGovernorate: place?.governorate || city,
           city,
-          startDate:    startDate.toISOString(),
-          endDate:      endDate.toISOString(),
+          startDate:    toUtcMidnightIso(startDate),
+          endDate:      toUtcMidnightIso(endDate),
           people,
           totalBudgetEgp: budget,
           isPublic:     false,

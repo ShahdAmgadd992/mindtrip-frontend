@@ -43,6 +43,13 @@ const formatDate = (d) => {
   if (!d) return "";
   return `${String(d.getDate()).padStart(2,"0")}/${String(d.getMonth()+1).padStart(2,"0")}/${d.getFullYear()}`;
 };
+// ✅ FIX: inclusive day count (1 Aug → 3 Aug = 3 days, not 2). The old
+// Math.ceil((endDate-startDate)/86400000) calculated nights, not the
+// calendar days the trip spans, which made this UI show "2 day trip" for a
+// 3-day selection and (via createTripWithPlan) made the AI plan only 2 days,
+// leaving the 3rd day's box empty in trip-result.
+const getTripDayCount = (start, end) =>
+  Math.max(1, Math.round((end - start) / 86400000) + 1);
 
 // ─── Shared small components ──────────────────────────────────────────────────
 const CloseBtn = ({ onClick }) => (
@@ -827,7 +834,7 @@ const TripDetails = ({ place }) => {
                   </div>
                   {startDate && endDate && (
                     <p style={{ fontSize: "13px", color: "#5596fe", marginTop: "6px" }}>
-                      {Math.max(1, Math.ceil((endDate - startDate) / 86400000))} day trip
+                      {getTripDayCount(startDate, endDate)} day trip
                     </p>
                   )}
                 </div>
@@ -844,7 +851,7 @@ const TripDetails = ({ place }) => {
                   {startDate && endDate && (
                     <p style={{ fontSize: "12px", color: "#888", marginTop: "6px" }}>
                       ≈ {calcBudget(budgetTier,
-                          Math.max(1, Math.ceil((endDate - startDate) / 86400000)),
+                          getTripDayCount(startDate, endDate),
                           numPeople).toLocaleString()} EGP total
                     </p>
                   )}
