@@ -1441,7 +1441,7 @@
     sans-serif;
 }
 .td-modal-manage-trip::-webkit-scrollbar {
-  display: none; /* Chrome, Safari, Edge */
+  display: none;
 }
 .td-mt-title {
   font-size: 22px;
@@ -1667,5 +1667,7 @@
   animation: td-spin 0.8s linear infinite;
 }
 @keyframes td-spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }

@@ -3,7 +3,7 @@ import Navbar from "../layout/Navbar";
 import Footer from "../layout/Footer";
 import "./SavedPlaces.css";
 import { useSavedPlaces } from "../../context/SavedPlacesContext";
-
+// import { useSavedPlaces } from "../../context/SavedPlacesContext";
 const filters = [
   "All",
   "Hotels",
